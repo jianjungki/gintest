@@ -20,8 +20,8 @@ type TransferObj struct {
 	Price     int    `json:"price"`
 	RunTime   int    `json:"run_time"`
 	//0 火车 1 汽车 2 公交 3 机票
-	TransferType string `json:"type"`
-	TravelNum    int    `json:"travel_num"`
+	TransferType int `json:"type"`
+	TravelNum    int `json:"travel_num"`
 }
 
 type TravelObj struct {
