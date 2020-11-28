@@ -123,7 +123,7 @@ func TravelCardSubmit(c *gin.Context) {
 		fmt.Printf("db client preare error: %v", err.Error())
 	}
 
-	args := []interface{}{}
+	args := []interface{}{"", "", ""}
 	if jsonerr == nil {
 		args = []interface{}{travelParam.TravelNum, travelParam.Destination, travelParam.TravelTime}
 	}
