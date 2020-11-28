@@ -17,7 +17,6 @@ func Meal(c *colly.Collector) {
 	////*[@id="app"]/section/div/div[2]/div[1]/div/div[1]/ul
 
 	c.OnHTML(".more.clear", func(e *colly.HTMLElement) {
-		//fmt.Println("response", e.Text)
 		e.ForEach("li a", func(i int, h *colly.HTMLElement) {
 			meal[h.Text] = h.Attr("href")
 		})

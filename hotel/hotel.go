@@ -25,11 +25,13 @@ func Hotel(c *colly.Collector) {
 					//Score:     h.ChildText(".list-card-comment .score"),
 					//Price: h.ChildText("p.price>span.real-price.font-bold"),
 				},
+				CardType: common.Hotel,
 			}
 
 			h.ForEach(".list-card-tag .card-tag", func(j int, g *colly.HTMLElement) {
 				cardItem.SellPoint = append(cardItem.SellPoint, g.Text)
 			})
+			hotelList = append(hotelList, cardItem)
 			/*
 				fmt.Printf("title: %s\n", h.ChildText("span.name.font-bold"))
 				fmt.Printf("point: %s\n", h.ChildText(".list-card-encourage p.review span"))

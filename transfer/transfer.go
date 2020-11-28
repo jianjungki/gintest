@@ -20,26 +20,52 @@ const TIME_LAYOUT = "2006-01-02 15:04:05"
 func TransferSearch(c *gin.Context) {
 	//transferType, _ := strconv.Atoi(c.get("type"))
 	req := TransferReq{}
-	if err := c.Bind(&req); err != nil {
-		switch req.TransferType {
-		case 0:
-			TrainSearch(c, req)
-		case 1:
-			LocalTransSearch(c)
-		case 2:
-			LocalTransSearch(c)
-		case 3:
-			FlightSearch(c, req)
-		}
+	resp := make([]common.TravelObj, 0)
+	if err := c.Bind(&req); err == nil {
+		resp = append(resp, TrainSearch(c, req))
+		//resp = append(resp, LocalTransSearch(c, req))
+		resp = append(resp, FlightSearch(c, req))
+
+		common.CommJOSN(c, 200, resp)
 	} else {
 		common.FaildJOSN(c, 200, "")
 	}
 
 }
 
-func LocalTransSearch(c *gin.Context) {
-	c.HTML(200, "wait for develop", nil)
-	//return
+//curl -i -k -X ANY 'https://jisugjdtmf.market.alicloudapi.com/transit/station2s?city=%E6%9D%AD%E5%B7%9E&end=%E6%9D%AD%E5%B7%9E%E6%B1%BD%E8%BD%A6%E5%8C%97%E7%AB%99&endcity=endcity&start=%E8%A5%BF%E6%BA%AA%E7%AB%9E%E8%88%9F%E8%8B%91&type=transit'  -H 'Authorization:APPCODE 你自己的AppCode'
+func LocalTransSearch(c *gin.Context, req TransferReq) common.TravelObj {
+	baseUrl := "https://jisugjdtmf.market.alicloudapi.com/transit/station2s?city=深圳&end=深圳火车站&start=宝安机场&type=transit"
+	transobj := common.TravelObj{}
+	client := &http.Client{}
+	reqObj, err := http.NewRequest("GET", fmt.Sprintf(baseUrl, req.ArriveCty, req.StartCty), nil)
+	if err != nil {
+		fmt.Printf("get error: %v", err.Error())
+	}
+	reqObj.Header.Add("Authorization", fmt.Sprintf("APPCODE %s", appCode))
+
+	response, err := client.Do(reqObj)
+	if err != nil {
+		fmt.Printf("request url get error: %v", err.Error())
+	}
+	defer response.Body.Close()
+
+	rawBody, err := ioutil.ReadAll(response.Body)
+	if err != nil {
+		fmt.Printf("readall get error: %v", err.Error())
+	}
+
+	data := LocalTransData{}
+	err = json.Unmarshal(rawBody, &data)
+	if err != nil {
+		fmt.Printf("json unmarshal error: %v", err.Error())
+	}
+	if len(data.Result) > 0 {
+		resultObj := data.Result[0]
+		transobj.RunTime = resultObj.Totalduration
+
+		//transobj.StartCity = resultObj.
+	}
 }
 
 type TransferReq struct {
@@ -51,13 +77,8 @@ type TransferReq struct {
 }
 
 //curl -i -k -X ANY 'https://jisutrain.market.alicloudapi.com/train/station2s?date=2019-11-21&end=%E5%8C%97%E4%BA%AC&ishigh=0&start=%E6%9D%AD%E5%B7%9E'  -H 'Authorization:APPCODE 你自己的AppCode'
-func TrainSearch(c *gin.Context, req TransferReq) {
+func TrainSearch(c *gin.Context, req TransferReq) common.TravelObj {
 	baseUrl := "https://jisutrain.market.alicloudapi.com/train/station2s?date=%s&end=%s&ishigh=1&start=%s"
-	/*
-		leaveCity := c.PostForm("leave")
-		arriveCity := c.PostForm("arrive")
-		start_date := c.PostForm("start_date")
-	*/
 
 	fmt.Printf("req url: %s\n", fmt.Sprintf(baseUrl, req.StartDate, req.ArriveCty, req.StartCty))
 
@@ -96,12 +117,10 @@ func TrainSearch(c *gin.Context, req TransferReq) {
 
 	transObj := common.TravelObj{
 		TransferObj: common.TransferObj{
-			StartCity: result.Start,
-			DestCity:  result.End,
-			//Price:        price,
+			StartCity:    result.Start,
+			DestCity:     result.End,
 			RunTime:      runTimeMinute,
 			TransferType: 0,
-			//TravelNum:    2,
 		},
 		CommonCard: common.CommonCard{
 			Price:     price,
@@ -109,14 +128,15 @@ func TrainSearch(c *gin.Context, req TransferReq) {
 		},
 		CardType: 0,
 	}
-	common.CommJOSN(c, 200, transObj)
+	return transObj
+	//common.CommJOSN(c, 200, transObj)
 
 }
 
 //http://plane.market.alicloudapi.com/ai_market/ai_airplane/get_airplane_list?END_CITY=%E6%8A%B5%E8%BE%BE%E5%9F%8E%E5%B8%82&END_DATE=%E8%BF%94%E7%A8%8B%E6%97%A5%E6%9C%9F&START_CITY=%E5%87%BA%E5%8F%91%E5%9F%8E%E5%B8%82&START_DATE=%E5%87%BA%E5%8F%91%E6%97%A5%E6%9C%9F'  -H 'Authorization:APPCODE 你自己的AppCode'
 //secret n41OKG54j0MYHd7ni6AAZ4OOEhCaCGQg
 //code c4387c3c3422485fb072a5ead254d226
-func FlightSearch(c *gin.Context, req TransferReq) {
+func FlightSearch(c *gin.Context, req TransferReq) common.TravelObj {
 
 	baseUrl := "http://plane.market.alicloudapi.com/ai_market/ai_airplane/get_airplane_list?END_CITY=%s&START_CITY=%s&START_DATE=%s"
 
@@ -164,12 +184,10 @@ func FlightSearch(c *gin.Context, req TransferReq) {
 
 	transObj := common.TravelObj{
 		TransferObj: common.TransferObj{
-			StartCity: data.StartCity,
-			DestCity:  data.EndCity,
-			//Price:        0,
+			StartCity:    data.StartCity,
+			DestCity:     data.EndCity,
 			RunTime:      runTimeMinute,
 			TransferType: 3,
-			//TravelNum:    2,
 		},
 		CommonCard: common.CommonCard{
 			Price:     0,
@@ -177,7 +195,7 @@ func FlightSearch(c *gin.Context, req TransferReq) {
 		},
 		CardType: 0,
 	}
-
-	common.CommJOSN(c, 200, transObj)
+	return transObj
+	//common.CommJOSN(c, 200, transObj)
 
 }

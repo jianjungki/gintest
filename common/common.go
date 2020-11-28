@@ -16,7 +16,7 @@ type CommonCard struct {
 type TransferObj struct {
 	StartCity string `json:"start"`
 	DestCity  string `json:"end"`
-	RunTime   int    `json:"run_time"`
+	RunTime   string `json:"run_time"`
 	//0 火车 1 汽车 2 公交 3 机票
 	TransferType int `json:"type"`
 }
@@ -27,6 +27,13 @@ type TravelObj struct {
 
 	CardType int `json:"card_type"`
 }
+
+const (
+	Trasfer int = iota
+	Eat
+	Hotel
+	Play
+)
 
 type TravelAdd struct {
 	TravelNum   int    `json:"person"`

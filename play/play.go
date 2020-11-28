@@ -24,7 +24,10 @@ func Play(c *colly.Collector) {
 					SellPoint: []string{h.ChildText("p")},
 					Title:     h.ChildText("h3 a:nth-child(2)"),
 					ReviewNum: h.ChildText("h3 a:nth-child(3) .rev-total"),
-				}})
+				},
+				CardType: common.Play,
+			})
+
 			//fmt.Printf("point: %s\n", h.ChildText("p"))
 			//fmt.Printf("title: %s\n", h.ChildText("h3 a:nth-child(2)"))
 			//fmt.Printf("reviews: %s\n", h.ChildText("h3 a:nth-child(3) .rev-total"))

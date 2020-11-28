@@ -244,3 +244,54 @@ type TrainList struct {
 	Type          string  `json:"type"`
 	Typename      string  `json:"typename"`
 }
+
+type LocalTransData struct {
+	Msg    string             `json:"msg"`
+	Result []LocalTransResult `json:"result"`
+	Status int64              `json:"status"`
+}
+
+type LocalTransPOI struct {
+	Lat float64 `json:"lat"`
+	Lng float64 `json:"lng"`
+}
+
+type LocalTransStation struct {
+	InterventType int64 `json:"intervent_type"`
+	Underground   int64 `json:"underground"`
+}
+
+type LocalTransStep struct {
+	CanRide           int64               `json:"can_ride"`
+	Distance          int64               `json:"distance"`
+	Duration          int64               `json:"duration"`
+	Ename             string              `json:"ename"`
+	Endname           string              `json:"endname"`
+	Endpoi            LocalTransPOI       `json:"endpoi"`
+	IsDepot           int64               `json:"is_depot"`
+	SpathBegin        []int64             `json:"spath_begin"`
+	SpathEnd          []int64             `json:"spath_end"`
+	Startpoi          LocalTransPOI       `json:"startpoi"`
+	Station           []LocalTransStation `json:"station"`
+	Steptext          string              `json:"steptext"`
+	SwalkEndLeadpoint []int64             `json:"swalk_end_leadpoint"`
+	Tip               int64               `json:"tip"`
+	TipBackground     string              `json:"tip_background"`
+	TipText           string              `json:"tip_text"`
+	TransType         int64               `json:"trans_type"`
+	Type              int64               `json:"type"`
+	Vehicle           []interface{}       `json:"vehicle"`
+	WalkType          int64               `json:"walk_type"`
+}
+
+type LocalTransResult struct {
+	Arrivetime        string           `json:"arrivetime"`
+	Steps             []LocalTransStep `json:"steps"`
+	Tiptype           int64            `json:"tiptype"`
+	Totaldistance     string           `json:"totaldistance"`
+	Totalduration     string           `json:"totalduration"`
+	Totalprice        int64            `json:"totalprice"`
+	Totalstopnum      int64            `json:"totalstopnum"`
+	Totalwalkdistance string           `json:"totalwalkdistance"`
+	Vehicles          []string         `json:"vehicles"`
+}
