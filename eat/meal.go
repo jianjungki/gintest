@@ -8,6 +8,8 @@ import (
 	"github.com/gocolly/colly/v2"
 )
 
+var mealList []common.TravelObj
+
 func Meal(c *colly.Collector) {
 
 	meal := map[string]string{}
@@ -36,4 +38,5 @@ func Meal(c *colly.Collector) {
 func MealSearch(c *gin.Context) {
 	collyObj := colly.NewCollector()
 	Meal(collyObj)
+	common.CommJOSN(c, 200, mealList)
 }

@@ -8,6 +8,8 @@ import (
 	"github.com/gocolly/colly/v2"
 )
 
+var hotelList []common.TravelObj
+
 func Hotel(c *colly.Collector) {
 	//hotel := map[string]string{}
 	// Find and visit all links
@@ -15,17 +17,30 @@ func Hotel(c *colly.Collector) {
 	c.OnHTML(".long-list", func(e *colly.HTMLElement) {
 
 		e.ForEach(".with-decorator-wrap", func(i int, h *colly.HTMLElement) {
-			fmt.Printf("title: %s\n", h.ChildText("span.name.font-bold"))
-			fmt.Printf("point: %s\n", h.ChildText(".list-card-encourage p.review span"))
-			//特点
+			cardItem := common.TravelObj{
+				CommonCard: common.CommonCard{
+					Title: h.ChildText("span.name.font-bold"),
+					//Price:  h.ChildText("p.price>span.real-price.font-bold"),
+					ReviewNum: h.ChildText(".list-card-comment .describe .count"),
+					//Score:     h.ChildText(".list-card-comment .score"),
+					//Price: h.ChildText("p.price>span.real-price.font-bold"),
+				},
+			}
+
 			h.ForEach(".list-card-tag .card-tag", func(j int, g *colly.HTMLElement) {
-				fmt.Printf("special: %s\n", g.Text)
+				cardItem.SellPoint = append(cardItem.SellPoint, g.Text)
 			})
+			/*
+				fmt.Printf("title: %s\n", h.ChildText("span.name.font-bold"))
+				fmt.Printf("point: %s\n", h.ChildText(".list-card-encourage p.review span"))
+				//特点
 
-			fmt.Printf("review count: %s\n", h.ChildText(".list-card-comment .describe .count"))
-			fmt.Printf("score: %s\n", h.ChildText(".list-card-comment .score"))
 
-			fmt.Printf("price: %s\n", h.ChildText("p.price>span.real-price.font-bold"))
+				fmt.Printf("review count: %s\n", h.ChildText(".list-card-comment .describe .count"))
+				fmt.Printf("score: %s\n", h.ChildText(".list-card-comment .score"))
+
+				fmt.Printf("price: %s\n", h.ChildText("p.price>span.real-price.font-bold"))
+			*/
 		})
 	})
 
@@ -44,4 +59,5 @@ func Hotel(c *colly.Collector) {
 func HotelSearch(c *gin.Context) {
 	collyObj := colly.NewCollector()
 	Hotel(collyObj)
+	common.CommJOSN(c, 200, hotelList)
 }

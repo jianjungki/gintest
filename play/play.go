@@ -8,6 +8,8 @@ import (
 	"github.com/gocolly/colly/v2"
 )
 
+var playList []common.TravelObj
+
 func Play(c *colly.Collector) {
 
 	//hotel := map[string]string{}
@@ -17,9 +19,15 @@ func Play(c *colly.Collector) {
 	c.OnHTML("#container", func(e *colly.HTMLElement) {
 
 		e.ForEach(".row.row-top5 div.item.clearfix div.info div.middle", func(i int, h *colly.HTMLElement) {
-			fmt.Printf("point: %s\n", h.ChildText("p"))
-			fmt.Printf("title: %s\n", h.ChildText("h3 a:nth-child(2)"))
-			fmt.Printf("reviews: %s\n", h.ChildText("h3 a:nth-child(3) .rev-total"))
+			playList = append(playList, common.TravelObj{
+				CommonCard: common.CommonCard{
+					SellPoint: []string{h.ChildText("p")},
+					Title:     h.ChildText("h3 a:nth-child(2)"),
+					ReviewNum: h.ChildText("h3 a:nth-child(3) .rev-total"),
+				}})
+			//fmt.Printf("point: %s\n", h.ChildText("p"))
+			//fmt.Printf("title: %s\n", h.ChildText("h3 a:nth-child(2)"))
+			//fmt.Printf("reviews: %s\n", h.ChildText("h3 a:nth-child(3) .rev-total"))
 			//fmt.Printf("desc: %s", h.ChildText("div.links:nth-child(3)"))
 			//fmt.Printf("point: %s\n", h.ChildText("div.info>div.middle p"))
 			//fmt.Printf("point: %s\n", h.ChildText("div.info>div.middle p"))
@@ -53,9 +61,11 @@ func Play(c *colly.Collector) {
 	if err != nil {
 		fmt.Printf("mafengwo visting error: %v\n", err.Error())
 	}
+
 }
 
 func PlaySearch(c *gin.Context) {
 	collyObj := colly.NewCollector()
 	Play(collyObj)
+	common.CommJOSN(c, 200, playList)
 }

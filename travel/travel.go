@@ -1,13 +1,13 @@
 package travel
 
 import (
+	"database/sql"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"main/common"
 	"main/db"
 	"net/http"
-	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
@@ -29,6 +29,12 @@ type HomepageObj struct {
 	TitleTips      string `json:"title_tips"`
 	Destination    string `json:"destination"`
 	Notice         string `json:"notice"`
+}
+
+var DBClient *sql.DB
+
+func init() {
+	DBClient = db.GetDB()
 }
 
 func TravelHomePage(c *gin.Context) {
@@ -108,27 +114,30 @@ const uniqueIDKey = "uniqueID"
 const uniqueIDTripKey = "uniqueID:%d:trip"
 
 func TravelCardSubmit(c *gin.Context) {
-	dbObj := db.ReplDB{}
+	//dbObj := db.ReplDB{}
 	var travelParam common.TravelAdd
-	if c.BindJSON(&travelParam) == nil {
-		byteData, _ := json.Marshal(travelParam)
-		dbObj.Insert(uniqueIDTripKey, string(byteData))
+	jsonerr := c.BindJSON(&travelParam)
+
+	smt, err := DBClient.Prepare(`insert into trip(nums, destination, travel_date) values(?,?,?)`)
+	if err != nil {
+		fmt.Printf("db client preare error: %v", err.Error())
 	}
 
-	retID := 0
-	if uniID, err := dbObj.Query(uniqueIDKey); err == nil {
-		uniIDInt, _ := strconv.Atoi(uniID)
-		retID = uniIDInt + 1
-		retIDStr := strconv.Itoa(retID)
-		dbObj.Update(uniqueIDKey, retIDStr)
-	} else {
-		retID = 1
-		retIDStr := strconv.Itoa(retID)
-		dbObj.Insert(uniqueIDKey, retIDStr)
+	args := []interface{}{}
+	if jsonerr == nil {
+		args = []interface{}{travelParam.TravelNum, travelParam.Destination, travelParam.TravelTime}
 	}
+
+	ret, err := smt.Exec(args...)
+	if err != nil {
+		fmt.Printf("db client exec error: %v", err.Error())
+	} else {
+		fmt.Printf("insert rows %v", ret)
+	}
+	insertID, _ := ret.LastInsertId()
 
 	tripObj := TravelTrip{
-		ID: retID,
+		ID: int(insertID),
 	}
 	common.CommJOSN(c, 200, tripObj)
 }
