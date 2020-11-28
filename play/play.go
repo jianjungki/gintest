@@ -1,13 +1,12 @@
-
 package play
+
 import (
 	"fmt"
-  "github.com/gin-gonic/gin"
+	"main/common"
+
+	"github.com/gin-gonic/gin"
 	"github.com/gocolly/colly/v2"
-  "main/common"
 )
-
-
 
 func Play(c *colly.Collector) {
 
@@ -50,14 +49,13 @@ func Play(c *colly.Collector) {
 	})
 	//2020/11/29
 	baseUrl := "https://www.mafengwo.cn/jd/10198/gonglve.html"
-	err := c.Visit(common.RenderServer+baseUrl)
+	err := c.Visit(common.RenderServer + baseUrl)
 	if err != nil {
 		fmt.Printf("mafengwo visting error: %v\n", err.Error())
 	}
 }
 
-
-func PlaySearch(c *gin.Context)  {
-  collyObj := colly.NewCollector()
-  Play(collyObj)
-} 
+func PlaySearch(c *gin.Context) {
+	collyObj := colly.NewCollector()
+	Play(collyObj)
+}

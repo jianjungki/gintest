@@ -1,21 +1,21 @@
 package db
 
-
 import (
-  "github.com/replit/database-go"
+	"github.com/replit/database-go"
 )
-type ReplDB struct {}
 
-func (m *ReplDB) Query(key string) (string,error) {
-  return database.Get(key)
-  
+type ReplDB struct{}
+
+func (m *ReplDB) Query(key string) (string, error) {
+	return database.Get(key)
+
 }
 
 func (m *ReplDB) Delete(key string) error {
-  return database.Delete(key)
+	return database.Delete(key)
 }
 
-func (m *ReplDB) Update(key , value string) error {
+func (m *ReplDB) Update(key, value string) error {
 	return database.Set(key, value)
 }
 

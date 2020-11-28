@@ -2,10 +2,12 @@ package eat
 
 import (
 	"fmt"
-  "github.com/gin-gonic/gin"
+	"main/common"
+
+	"github.com/gin-gonic/gin"
 	"github.com/gocolly/colly/v2"
-  "main/common"
 )
+
 func Meal(c *colly.Collector) {
 
 	meal := map[string]string{}
@@ -23,7 +25,7 @@ func Meal(c *colly.Collector) {
 		fmt.Println("Visiting", r.URL)
 	})
 
-	err := c.Visit(common.RenderServer+"https://sz.meituan.com/meishi/")
+	err := c.Visit(common.RenderServer + "https://sz.meituan.com/meishi/")
 	if err != nil {
 		fmt.Printf("meituan visting error: %v\n", err.Error())
 	}
@@ -31,7 +33,7 @@ func Meal(c *colly.Collector) {
 	fmt.Printf("meals: %v", meal)
 }
 
-func MealSearch(c *gin.Context)  {
-  collyObj := colly.NewCollector()
-  Meal(collyObj)
-} 
+func MealSearch(c *gin.Context) {
+	collyObj := colly.NewCollector()
+	Meal(collyObj)
+}

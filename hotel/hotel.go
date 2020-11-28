@@ -2,9 +2,10 @@ package hotel
 
 import (
 	"fmt"
-  "github.com/gin-gonic/gin"
+	"main/common"
+
+	"github.com/gin-gonic/gin"
 	"github.com/gocolly/colly/v2"
-  "main/common"
 )
 
 func Hotel(c *colly.Collector) {
@@ -40,7 +41,7 @@ func Hotel(c *colly.Collector) {
 	}
 }
 
-func HotelSearch(c *gin.Context)  {
-  collyObj := colly.NewCollector()
-  Hotel(collyObj)
-} 
+func HotelSearch(c *gin.Context) {
+	collyObj := colly.NewCollector()
+	Hotel(collyObj)
+}
