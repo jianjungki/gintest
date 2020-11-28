@@ -94,7 +94,7 @@ func IPToLoc(c *gin.Context) IPGeoData {
 }
 
 func TravelCardSubmit(c *gin.Context){
-  
+    
 }
 
 

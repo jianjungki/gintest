@@ -19,9 +19,7 @@ func main() {
 		c.JSON(200, "")
 	})
 
-  r.POST("/save", func(c *gin.Context) {
-      c.JSON(200, "{}")
-  })
+  r.POST("/save", )
 
   r.GET("/del/:id", func(c *gin.Context) {
       c.JSON(200, "{}")
