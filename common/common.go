@@ -15,6 +15,11 @@ func init() {
 	DBClient = db.GetDB()
 }
 
+var DescText = `国内首个集休闲度假、观光旅游、户外运动、科普教育等主题于一体的大型综合性国家生态旅游示范区。
+·大侠谷生态乐园和茶溪谷度假公园，集山地郊野和都市主题公园于一体，呈现了一个中西文化交融的世界。
+·茵特拉根小镇、海菲德小镇和茶翁古镇，打造出童话一般的茶文化、葡萄酒文化梦幻小镇。
+·每天还会有融合了多种艺术手段，以禅茶文化为主题的大型多媒体交响音画晚会《天禅》在大剧院上演。`
+
 type CommonCard struct {
 	ID            int      `json:"travel_id"`
 	ReviewNum     string   `json:"review_num"`    //评论数
@@ -28,6 +33,10 @@ type CommonCard struct {
 	SellPoint     []string `json:"sell_point"`    //卖点
 	Selected      int      `json:"selector"`
 	TripID        int      `json:"tripid"` //行程id
+
+	//AroundPos string `json:"around_pos"`
+	RoomNum  int `json:"room_num"` //room_num
+	LiveDays int `json:"leave_days"`
 }
 type TransferObj struct {
 	StartCity string `json:"start"`
@@ -98,13 +107,14 @@ func FaildJOSN(c *gin.Context, statusCode int, resp interface{}) {
 }
 
 type CommonReq struct {
-	TripID    int `json:"tripid"`
-	Category  int `json:"category"`
-	Price     int `json:"price"`
-	Person    int `json:"person"`
-	HotelRate int `json:"hotel_rate"`
-	LiveDays  int `json:"leave_days"`
-	RoomNum   int `json:"room_num"`
+	TripID    int    `json:"tripid"`
+	Category  int    `json:"category"`
+	Price     int    `json:"price"`
+	Person    int    `json:"person"`
+	HotelRate int    `json:"hotel_rate"`
+	LiveDays  int    `json:"leave_days"`
+	AroundPos string `json:"around_pos"`
+	RoomNum   int    `json:"room_num"`
 }
 
 func AddTravelRecord(tripId int, travelItem TravelObj) {

@@ -22,6 +22,7 @@ func Play(c *colly.Collector) {
 
 			playObj := common.TravelObj{
 				CommonCard: common.CommonCard{
+					Desc:      common.DescText,
 					SellPoint: []string{h.ChildText("p")},
 					Title:     h.ChildText("h3 a:nth-child(2)"),
 					ReviewNum: h.ChildText("h3 a:nth-child(3) .rev-total"),

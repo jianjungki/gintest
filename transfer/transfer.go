@@ -16,6 +16,9 @@ import (
 var appCode = "c4387c3c3422485fb072a5ead254d226"
 
 const TIME_LAYOUT = "2006-01-02 15:04:05"
+const TIME_LAYOUT_2 = "20060102 15:04:05"
+const DATE_LAYOUT = "2006-01-02"
+const DATE_LAYOUT_2 = "20060102"
 
 func TransferSearch(c *gin.Context) {
 	//transferType, _ := strconv.Atoi(c.get("type"))
@@ -72,7 +75,7 @@ type TransferReq struct {
 	TransferType int    `json:"type"`
 	StartCty     string `json:"leave"`
 	ArriveCty    string `json:"arrive"`
-	StartDate    string `json:"sart_date"`
+	StartDate    string `json:"start_date"`
 	EndDate      string `json:"end_date"`
 	TripID       int    `json:"tripid"`
 }
@@ -141,6 +144,8 @@ func FlightSearch(c *gin.Context, req TransferReq) common.TravelObj {
 
 	baseUrl := "http://plane.market.alicloudapi.com/ai_market/ai_airplane/get_airplane_list?END_CITY=%s&START_CITY=%s&START_DATE=%s"
 
+	startTime, _ := time.Parse(DATE_LAYOUT, req.StartDate)
+	req.StartDate = startTime.Format(DATE_LAYOUT_2)
 	/*
 		leaveCity := c.PostForm("leave")
 		arriveCity := c.PostForm("arrive")
@@ -161,12 +166,13 @@ func FlightSearch(c *gin.Context, req TransferReq) common.TravelObj {
 		fmt.Printf("request url get error: %v", err.Error())
 	}
 	defer response.Body.Close()
-	fmt.Printf("response %v", response.Body)
 
 	rawBody, err := ioutil.ReadAll(response.Body)
 	if err != nil {
 		fmt.Printf("readall get error: %v", err.Error())
 	}
+
+	//fmt.Printf("rawData: %s", string(rawBody))
 
 	data := FligtData{}
 	err = json.Unmarshal(rawBody, &data)
@@ -174,26 +180,27 @@ func FlightSearch(c *gin.Context, req TransferReq) common.TravelObj {
 		fmt.Printf("unmarshal get error: %v", err.Error())
 	}
 
-	runTimeMinute := 0
+	runTimeMinuteStr := ""
+	flightItem := FlightItem{}
 	if len(data.Flights) > 0 {
-		flightItem := data.Flights[0]
+		flightItem = data.Flights[0]
 		endDateTime := flightItem.EndDate + " " + flightItem.EndTime + ":00"
 		startDateTime := flightItem.StartDate + " " + flightItem.StartTime + ":00"
 
 		fmt.Printf("endDateTime: %s", endDateTime)
 		fmt.Printf("startDateTime: %s", startDateTime)
-		endTime, _ := time.Parse(TIME_LAYOUT, endDateTime)
-		startTime, _ := time.Parse(TIME_LAYOUT, startDateTime)
+		endTime, _ := time.Parse(TIME_LAYOUT_2, endDateTime)
+		startTime, _ := time.Parse(TIME_LAYOUT_2, startDateTime)
 
 		runTime := endTime.Sub(startTime)
-		runTimeMinute = int(runTime.Hours()*24 + runTime.Minutes())
+		runTimeMinuteStr = fmt.Sprintf("%d小时%d分钟", int(runTime.Hours()), int(runTime.Minutes())%60)
 	}
 
 	transObj := common.TravelObj{
 		TransferObj: common.TransferObj{
-			StartCity:    data.StartCity,
-			DestCity:     data.EndCity,
-			RunTime:      fmt.Sprintf("%d", runTimeMinute),
+			StartCity:    flightItem.StartAirportCh,
+			DestCity:     flightItem.EndAirportCh,
+			RunTime:      runTimeMinuteStr,
 			TransferType: 3,
 		},
 		CommonCard: common.CommonCard{

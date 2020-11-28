@@ -202,7 +202,7 @@ type FlightItem struct {
 type TrainData struct {
 	Msg    string      `json:"msg"`
 	Result TrainResult `json:"result"`
-	Status int64       `json:"status"`
+	Status interface{} `json:"status"`
 }
 
 type TrainResult struct {
