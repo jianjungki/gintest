@@ -14,6 +14,31 @@ type CommonCard struct  {
     SellPoint string `json:"sell_point"` //卖点
 }
 
+type TransferObj struct  {
+    StartCity string `json:"start"`
+    EndCity string `json:"start"`
+    Price int `json:"price"`
+    RunTime int `json:"run_time"`
+    //0 火车 1 汽车 2 公交 3 机票
+    TransferType string `json:"type"`
+    TravelNum int `json:"travel_num"`
+}
+
+type TravelObj struct{
+  CommonCard
+  TransferObj
+  CardType int `json:"card_type"`
+}
+
+
+type TravelAdd struct{
+  TravelNum int `json:"person"`
+  Destination string `json:"destination"`
+  TravelTime string `json:"travel_time"`
+}
+
+
+
 var RenderServer = ""
 
 //CommonResp

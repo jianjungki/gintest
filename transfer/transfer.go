@@ -5,21 +5,14 @@ import (
   "net/http"
   "fmt"
   "io/ioutil"
- // "main/common"
+  "main/common"
+  "time"
+  
   "encoding/json"
   "strconv"
 )
 var appCode = "c4387c3c3422485fb072a5ead254d226"
-
-type TransferObj struct  {
-    StartCity string `json:"start"`
-    EndCity string `json:"start"`
-    Price string `json:"price"`
-    RunTime string `json:"run_time"`
-    //0 火车 1 汽车 2 公交 3 机票
-    TransferType string `json:"type"`
-    TravelNum int `json:"travel_num"`
-}
+const TIME_LAYOUT = "2006-01-02 15:04:05"
 
 func TransferSearch(c *gin.Context){
     transferType, _ := strconv.Atoi(c.PostForm("type"))
@@ -71,7 +64,28 @@ func TrainSearch(c *gin.Context) {
     data := TrainData{}
     json.Unmarshal(rawBody, &data)
 
-    c.JSON(200, data)
+    runTimeMinute := 0
+    price := 0
+    result := data.Result
+    if len(data.Result.List) > 0{
+      trainItem := data.Result.List[0]
+      runTimeMinute, _ = strconv.Atoi(trainItem.Costtime)
+      price = int(trainItem.Priceed)
+    }
+    
+    transObj := common.TravelObj{
+      TransferObj: common.TransferObj{
+        StartCity: result.Start,
+        EndCity: result.End,
+        Price: price,
+        RunTime:runTimeMinute,
+        TransferType: "",
+        TravelNum:2,
+      },
+      CardType: 0,
+    }
+
+    common.CommJOSN(c, 200, transObj)
 }
 
 //http://plane.market.alicloudapi.com/ai_market/ai_airplane/get_airplane_list?END_CITY=%E6%8A%B5%E8%BE%BE%E5%9F%8E%E5%B8%82&END_DATE=%E8%BF%94%E7%A8%8B%E6%97%A5%E6%9C%9F&START_CITY=%E5%87%BA%E5%8F%91%E5%9F%8E%E5%B8%82&START_DATE=%E5%87%BA%E5%8F%91%E6%97%A5%E6%9C%9F'  -H 'Authorization:APPCODE 你自己的AppCode'
@@ -110,27 +124,30 @@ func FlightSearch(c *gin.Context) {
 
     data := FligtData{} 
     json.Unmarshal(rawBody, &data)
-    /*
-    minPrice := 0 
-    runTime := 0
-    for _, fightItem := range data.Flights {
-        if minPrice == 0 && fightItem.FlightLowestPrice > 0{
-          minPrice = fightItem.FlightLowestPrice
-          runTime = flightItem.FlightAirTime
-        } else if fightItem.FlightLowestPrice < minPrice{
-          minPrice = fightItem.FlightLowestPrice
-          runTime = flightItem.FlightAirTime
-        }
+
+    runTimeMinute := 0 
+    if len(data.Flights) > 0{
+      flightItem := data.Flights[0]
+      endDateTime := flightItem.EndDate + " "+flightItem.EndTime + ":00"
+      startDateTime := flightItem.StartDate +" "+ flightItem.StartTime+":00"
+
+      endTime,_ := time.Parse(TIME_LAYOUT, endDateTime)
+      startTime,_ := time.Parse(TIME_LAYOUT, startDateTime)
+      runTime := endTime.Sub(startTime)
+      runTimeMinute = int(runTime.Hours()*24 + runTime.Minutes())
     }
 
-    transObj := TransferObj{
-      StartCity: data.StartCity,
-      EndCity: data.EndCity,
-      Price: minPrice,
-      RunTime:runTime,
-      TransferType: 3,
-      TravelNum:2,
+    transObj := common.TravelObj{
+      TransferObj: common.TransferObj{
+        StartCity: data.StartCity,
+        EndCity: data.EndCity,
+        Price: 0,
+        RunTime:runTimeMinute,
+        TransferType: "",
+        TravelNum:2,
+      },
+      CardType: 0,
     }
-*/
-    c.JSON(200, data)
+
+    common.CommJOSN(c, 200, transObj)
 }

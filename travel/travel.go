@@ -6,7 +6,14 @@ import (
   "net/http"
   "main/common"
   "encoding/json"
+  "main/db"
+  "strconv"
 )
+
+type TravelTrip struct{
+  ID int `json:"trip_id"`
+  CommonCard []common.TravelObj `json:"cards"`
+}
 
 type Trip struct {
   Title string `json:"title"`
@@ -92,9 +99,36 @@ func IPToLoc(c *gin.Context) IPGeoData {
     return data.Data
     //c.JSON(200, data)
 }
+const uniqueIDKey = "uniqueID"
+const uniqueIDTripKey = "uniqueID:%d:trip"
 
 func TravelCardSubmit(c *gin.Context){
+    dbObj := db.ReplDB{}
+    var travelParam common.TravelAdd
+    if c.BindJSON(&travelParam) == nil {
+        byteData,_ := json.Marshal(travelParam)
+        dbObj.Insert(uniqueIDTripKey, string(byteData))
+    }
     
+    retID := 0
+    if uniID, err := dbObj.Query(uniqueIDKey);err == nil{
+       uniIDInt, _ := strconv.Atoi(uniID)
+        retID = uniIDInt+1
+        retIDStr := strconv.Itoa(retID)
+        dbObj.Update(uniqueIDKey, retIDStr)
+    }else{
+      retID = 1
+      retIDStr := strconv.Itoa(retID)
+       dbObj.Insert(uniqueIDKey, retIDStr)
+    }
+
+    
+
+
+    tripObj := TravelTrip{
+      ID: retID,
+    }
+    common.CommJOSN(c, 200, tripObj)
 }
 
 

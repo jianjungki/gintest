@@ -15,17 +15,21 @@ func main() {
 	//r.LoadHTMLFiles("index.html")
   r.GET("/homepage", travel.TravelHomePage)
 
-	r.GET("/list", func(c *gin.Context) {
+  r.POST("/travel/add", travel.TravelCardSubmit)
+
+	r.GET("/travel/list", func(c *gin.Context) {
 		c.JSON(200, "")
 	})
 
-  r.POST("/save", )
+  r.POST("/travel/save", func(c *gin.Context) {
+		c.JSON(200, "")
+	})
 
-  r.GET("/del/:id", func(c *gin.Context) {
+  r.GET("/travel/del/:id", func(c *gin.Context) {
       c.JSON(200, "{}")
   })
 
-  r.POST("/update", func(c *gin.Context) {
+  r.POST("/travel/update", func(c *gin.Context) {
       c.JSON(200, "{}")
   })
 
