@@ -1,6 +1,10 @@
 package common
 
-import "github.com/gin-gonic/gin"
+import (
+	"reflect"
+
+	"github.com/gin-gonic/gin"
+)
 
 type CommonCard struct {
 	ReviewNum     string   `json:"review_num"`    //评论数
@@ -12,6 +16,9 @@ type CommonCard struct {
 	TravelNum     int      `json:"travel_num"`    //游玩人数
 	Location      string   `json:"location"`      //大概位置
 	SellPoint     []string `json:"sell_point"`    //卖点
+
+	Selected int `json:"selector"`
+	TripID   int `json:"trip_id"` //行程id
 }
 type TransferObj struct {
 	StartCity string `json:"start"`
@@ -51,12 +58,25 @@ type CommonResp struct {
 }
 
 func CommJOSN(c *gin.Context, statusCode int, resp interface{}) {
+
 	respObj := CommonResp{
 		Code:    0,
 		Message: "成功",
 		Data:    resp,
 	}
+	if reflect.TypeOf(resp).Kind() == reflect.Slice {
+		respObj = CommonResp{
+			Code:    0,
+			Message: "成功",
+			Data: map[string]interface{}{
+				"list": resp,
+			},
+		}
+
+	}
+
 	c.JSON(statusCode, respObj)
+
 }
 
 func FaildJOSN(c *gin.Context, statusCode int, resp interface{}) {
@@ -66,4 +86,12 @@ func FaildJOSN(c *gin.Context, statusCode int, resp interface{}) {
 		Data:    resp,
 	}
 	c.JSON(statusCode, respObj)
+}
+
+type CommonReq struct {
+	TripID    int `json:"trip_id"`
+	Category  int `json:"category"`
+	Price     int `json:"price"`
+	Person    int `json:"person"`
+	HotelRate int `json:"hotel_rate"`
 }

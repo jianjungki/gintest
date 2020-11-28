@@ -10,7 +10,6 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"encoding/json"
-	"strconv"
 )
 
 var appCode = "c4387c3c3422485fb072a5ead254d226"
@@ -21,9 +20,8 @@ func TransferSearch(c *gin.Context) {
 	//transferType, _ := strconv.Atoi(c.get("type"))
 	req := TransferReq{}
 	resp := make([]common.TravelObj, 0)
-	if err := c.Bind(&req); err == nil {
+	if err := c.BindJSON(&req); err == nil {
 		resp = append(resp, TrainSearch(c, req))
-		//resp = append(resp, LocalTransSearch(c, req))
 		resp = append(resp, FlightSearch(c, req))
 
 		common.CommJOSN(c, 200, resp)
@@ -63,9 +61,9 @@ func LocalTransSearch(c *gin.Context, req TransferReq) common.TravelObj {
 	if len(data.Result) > 0 {
 		resultObj := data.Result[0]
 		transobj.RunTime = resultObj.Totalduration
-
-		//transobj.StartCity = resultObj.
 	}
+
+	return transobj
 }
 
 type TransferReq struct {
@@ -106,12 +104,12 @@ func TrainSearch(c *gin.Context, req TransferReq) common.TravelObj {
 		fmt.Printf("json unmarshal error: %v", err.Error())
 	}
 
-	runTimeMinute := 0
+	runTimeMinute := ""
 	price := 0
 	result := data.Result
 	if len(data.Result.List) > 0 {
 		trainItem := data.Result.List[0]
-		runTimeMinute, _ = strconv.Atoi(trainItem.Costtime)
+		runTimeMinute = trainItem.Costtime
 		price = int(trainItem.Priceed)
 	}
 
@@ -168,7 +166,10 @@ func FlightSearch(c *gin.Context, req TransferReq) common.TravelObj {
 	}
 
 	data := FligtData{}
-	json.Unmarshal(rawBody, &data)
+	err = json.Unmarshal(rawBody, &data)
+	if err != nil {
+		fmt.Printf("unmarshal get error: %v", err.Error())
+	}
 
 	runTimeMinute := 0
 	if len(data.Flights) > 0 {
@@ -186,7 +187,7 @@ func FlightSearch(c *gin.Context, req TransferReq) common.TravelObj {
 		TransferObj: common.TransferObj{
 			StartCity:    data.StartCity,
 			DestCity:     data.EndCity,
-			RunTime:      runTimeMinute,
+			RunTime:      fmt.Sprintf("%d", runTimeMinute),
 			TransferType: 3,
 		},
 		CommonCard: common.CommonCard{
@@ -196,6 +197,4 @@ func FlightSearch(c *gin.Context, req TransferReq) common.TravelObj {
 		CardType: 0,
 	}
 	return transObj
-	//common.CommJOSN(c, 200, transObj)
-
 }

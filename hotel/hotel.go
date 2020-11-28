@@ -22,6 +22,7 @@ func Hotel(c *colly.Collector) {
 					Title: h.ChildText("span.name.font-bold"),
 					//Price:  h.ChildText("p.price>span.real-price.font-bold"),
 					ReviewNum: h.ChildText(".list-card-comment .describe .count"),
+					Image:     "https://dimg04.c-ctrip.com/images/020691200082co240B8EA_R_300_225_R5_Q70_D.jpg",
 					//Score:     h.ChildText(".list-card-comment .score"),
 					//Price: h.ChildText("p.price>span.real-price.font-bold"),
 				},
@@ -31,6 +32,10 @@ func Hotel(c *colly.Collector) {
 			h.ForEach(".list-card-tag .card-tag", func(j int, g *colly.HTMLElement) {
 				cardItem.SellPoint = append(cardItem.SellPoint, g.Text)
 			})
+			//第三个
+			if len(hotelList) == 3 {
+				cardItem.Selected = 1
+			}
 			hotelList = append(hotelList, cardItem)
 			/*
 				fmt.Printf("title: %s\n", h.ChildText("span.name.font-bold"))
@@ -59,6 +64,7 @@ func Hotel(c *colly.Collector) {
 }
 
 func HotelSearch(c *gin.Context) {
+
 	collyObj := colly.NewCollector()
 	Hotel(collyObj)
 	common.CommJOSN(c, 200, hotelList)

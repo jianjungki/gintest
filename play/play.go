@@ -19,14 +19,21 @@ func Play(c *colly.Collector) {
 	c.OnHTML("#container", func(e *colly.HTMLElement) {
 
 		e.ForEach(".row.row-top5 div.item.clearfix div.info div.middle", func(i int, h *colly.HTMLElement) {
-			playList = append(playList, common.TravelObj{
+
+			playObj := common.TravelObj{
 				CommonCard: common.CommonCard{
 					SellPoint: []string{h.ChildText("p")},
 					Title:     h.ChildText("h3 a:nth-child(2)"),
 					ReviewNum: h.ChildText("h3 a:nth-child(3) .rev-total"),
+					Image:     "https://dimg04.c-ctrip.com/images/020691200082co240B8EA_R_300_225_R5_Q70_D.jpg",
 				},
 				CardType: common.Play,
-			})
+			}
+			//第三个
+			if len(playList) == 3 {
+				playObj.Selected = 1
+			}
+			playList = append(playList, playObj)
 
 			//fmt.Printf("point: %s\n", h.ChildText("p"))
 			//fmt.Printf("title: %s\n", h.ChildText("h3 a:nth-child(2)"))

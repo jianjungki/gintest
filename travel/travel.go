@@ -151,5 +151,34 @@ func TravelCardDel(c *gin.Context) {
 }
 
 func TravelCardList(c *gin.Context) {
+	type TravelIDReq struct {
+		ID int `json:"trip_id"`
+	}
+	req := TravelIDReq{}
+	if jsonerr := c.BindJSON(&req); jsonerr == nil {
+		respObj := []common.TravelObj{}
+		rows, err := DBClient.Query(`select type, trans_type, start_city, 
+    end_city, price, desc, title, location, 
+    travel_num, travel_time, image, trip_id from travel`)
+		if err != nil {
+			fmt.Printf("db client query error: %v", err.Error())
+		}
+		defer rows.Close()
+
+		for rows.Next() {
+			tmpObj := common.TravelObj{}
+			err := rows.Scan(&tmpObj.CardType, &tmpObj.TransferType, &tmpObj.StartCity,
+				&tmpObj.DestCity, &tmpObj.Price, &tmpObj.Desc, &tmpObj.Title, &tmpObj.Location,
+				&tmpObj.TravelNum, &tmpObj.TravelNum, &tmpObj.Image, &tmpObj.TripID)
+
+			if err != nil {
+				fmt.Printf("scan error: %v", err.Error())
+			}
+			respObj = append(respObj, tmpObj)
+		}
+		common.CommJOSN(c, 200, respObj)
+	} else {
+		common.FaildJOSN(c, 200, "")
+	}
 
 }
