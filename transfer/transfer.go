@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"main/common"
+	"math/rand"
 	"net/http"
 	"time"
 
@@ -177,8 +178,11 @@ func FlightSearch(c *gin.Context, req TransferReq) common.TravelObj {
 		endDateTime := flightItem.EndDate + " " + flightItem.EndTime + ":00"
 		startDateTime := flightItem.StartDate + " " + flightItem.StartTime + ":00"
 
+		fmt.Printf("endDateTime: %s", endDateTime)
+		fmt.Printf("startDateTime: %s", startDateTime)
 		endTime, _ := time.Parse(TIME_LAYOUT, endDateTime)
 		startTime, _ := time.Parse(TIME_LAYOUT, startDateTime)
+
 		runTime := endTime.Sub(startTime)
 		runTimeMinute = int(runTime.Hours()*24 + runTime.Minutes())
 	}
@@ -191,7 +195,7 @@ func FlightSearch(c *gin.Context, req TransferReq) common.TravelObj {
 			TransferType: 3,
 		},
 		CommonCard: common.CommonCard{
-			Price:     0,
+			Price:     rand.Intn(1000),
 			TravelNum: 2,
 		},
 		CardType: 0,

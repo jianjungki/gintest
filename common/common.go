@@ -1,12 +1,22 @@
 package common
 
 import (
+	"database/sql"
+	"fmt"
+	"main/db"
 	"reflect"
 
 	"github.com/gin-gonic/gin"
 )
 
+var DBClient *sql.DB
+
+func init() {
+	DBClient = db.GetDB()
+}
+
 type CommonCard struct {
+	ID            int      `json:"travel_id"`
 	ReviewNum     string   `json:"review_num"`    //评论数
 	Price         int      `json:"price"`         //价格
 	Title         string   `json:"title"`         //标题
@@ -16,9 +26,8 @@ type CommonCard struct {
 	TravelNum     int      `json:"travel_num"`    //游玩人数
 	Location      string   `json:"location"`      //大概位置
 	SellPoint     []string `json:"sell_point"`    //卖点
-
-	Selected int `json:"selector"`
-	TripID   int `json:"trip_id"` //行程id
+	Selected      int      `json:"selector"`
+	TripID        int      `json:"tripid"` //行程id
 }
 type TransferObj struct {
 	StartCity string `json:"start"`
@@ -89,9 +98,34 @@ func FaildJOSN(c *gin.Context, statusCode int, resp interface{}) {
 }
 
 type CommonReq struct {
-	TripID    int `json:"trip_id"`
+	TripID    int `json:"tripid"`
 	Category  int `json:"category"`
 	Price     int `json:"price"`
 	Person    int `json:"person"`
 	HotelRate int `json:"hotel_rate"`
+}
+
+func AddTravelRecord(tripId int, travelItem TravelObj) {
+	if tripId > 0 {
+
+		smt, err := DBClient.Prepare(`insert into travel(type, transfer_type, 
+			start_city, end_city, price, desc, title, location, 
+			travel_num, travel_time, image, trip_id) 
+			values(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`)
+		if err != nil {
+			fmt.Printf("db client preare error: %v", err.Error())
+		}
+
+		args := []interface{}{travelItem.CardType, travelItem.TransferType, travelItem.StartCity,
+			travelItem.DestCity, travelItem.Price, travelItem.Desc,
+			travelItem.Title, travelItem.Location, travelItem.TravelNum,
+			travelItem.EstimatedTime, travelItem.Image, tripId}
+
+		ret, err := smt.Exec(args...)
+		if err != nil {
+			fmt.Printf("db client exec error: %v", err.Error())
+		} else {
+			fmt.Printf("insert rows %v", ret)
+		}
+	}
 }

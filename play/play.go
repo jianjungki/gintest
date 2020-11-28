@@ -75,7 +75,13 @@ func Play(c *colly.Collector) {
 }
 
 func PlaySearch(c *gin.Context) {
-	collyObj := colly.NewCollector()
-	Play(collyObj)
-	common.CommJOSN(c, 200, playList)
+	commReq := common.CommonReq{}
+	if err := c.BindJSON(&commReq); err == nil {
+		collyObj := colly.NewCollector()
+		Play(collyObj)
+		common.AddTravelRecord(commReq.TripID, playList[3])
+		common.CommJOSN(c, 200, playList)
+	} else {
+		common.FaildJOSN(c, 200, "")
+	}
 }

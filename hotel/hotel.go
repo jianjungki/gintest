@@ -10,7 +10,7 @@ import (
 
 var hotelList []common.TravelObj
 
-func Hotel(c *colly.Collector) {
+func Hotel(c *colly.Collector, params common.CommonReq) {
 	//hotel := map[string]string{}
 	// Find and visit all links
 	////*[@id="app"]/section/div/div[2]/div[1]/div/div[1]/ul
@@ -57,15 +57,22 @@ func Hotel(c *colly.Collector) {
 	//2020/11/29
 	baseUrl := "https://hotels.ctrip.com/hotels/list"
 	baseUrl += "?countryId=1&city=%d&checkin=%s&checkout=%s&starlist=%d&optionId=%d&optionType=City&directSearch=0&crn=1&adult=1&children=0&searchBoxArg=t&travelPurpose=0&ctm_ref=ix_sb_dl&domestic=1"
-	err := c.Visit(fmt.Sprintf(common.RenderServer+baseUrl, 43, "2020/11/29", "2020/11/31", 2, 43))
+	err := c.Visit(fmt.Sprintf(common.RenderServer+baseUrl, 43, "2020/11/29", "2020/11/31", params.HotelRate, 43))
 	if err != nil {
 		fmt.Printf("ctrip visting error: %v\n", err.Error())
 	}
 }
 
 func HotelSearch(c *gin.Context) {
+	commReq := common.CommonReq{}
+	if err := c.BindJSON(&commReq); err == nil {
 
-	collyObj := colly.NewCollector()
-	Hotel(collyObj)
-	common.CommJOSN(c, 200, hotelList)
+		collyObj := colly.NewCollector()
+		Hotel(collyObj, commReq)
+		common.AddTravelRecord(commReq.TripID, hotelList[3])
+		common.CommJOSN(c, 200, hotelList)
+	} else {
+		common.FaildJOSN(c, 200, "")
+	}
+
 }

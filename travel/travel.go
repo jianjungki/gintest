@@ -13,7 +13,7 @@ import (
 )
 
 type TravelTrip struct {
-	ID         int                `json:"trip_id"`
+	ID         int                `json:"tripid"`
 	CommonCard []common.TravelObj `json:"cards"`
 }
 
@@ -105,13 +105,12 @@ func IPToLoc(c *gin.Context) IPGeoData {
 	}
 
 	data := IPGeoInfo{}
-	json.Unmarshal(rawBody, &data)
+	err = json.Unmarshal(rawBody, &data)
+	if err != nil {
+		fmt.Printf("rawData unmarshal err:%v", err.Error())
+	}
 	return data.Data
-	//c.JSON(200, data)
 }
-
-const uniqueIDKey = "uniqueID"
-const uniqueIDTripKey = "uniqueID:%d:trip"
 
 func TravelCardSubmit(c *gin.Context) {
 	//dbObj := db.ReplDB{}
@@ -147,12 +146,24 @@ func TravelCardUpdate(c *gin.Context) {
 }
 
 func TravelCardDel(c *gin.Context) {
+	travelId, _ := c.GetQuery("id")
+	ret, err := DBClient.Exec(`delete from travel where id = %s`, travelId)
+	if err != nil {
+		fmt.Printf("db client query error: %v", err.Error())
+	}
+	if rowsNum, err := ret.RowsAffected(); err == nil {
+		fmt.Printf("uptdae rows: %v", rowsNum)
+	} else {
+		fmt.Printf("uptdae rows error: %v", err.Error())
+	}
+
+	common.CommJOSN(c, 200, "")
 
 }
 
 func TravelCardList(c *gin.Context) {
 	type TravelIDReq struct {
-		ID int `json:"trip_id"`
+		ID int `json:"tripid"`
 	}
 	req := TravelIDReq{}
 	if jsonerr := c.BindJSON(&req); jsonerr == nil {
