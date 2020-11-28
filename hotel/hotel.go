@@ -66,9 +66,9 @@ func Hotel(c *colly.Collector, params common.CommonReq) {
 func HotelSearch(c *gin.Context) {
 	commReq := common.CommonReq{}
 	if err := c.BindJSON(&commReq); err == nil {
-
 		collyObj := colly.NewCollector()
 		Hotel(collyObj, commReq)
+
 		common.AddTravelRecord(commReq.TripID, hotelList[3])
 		common.CommJOSN(c, 200, hotelList)
 	} else {

@@ -25,6 +25,7 @@ func TransferSearch(c *gin.Context) {
 		resp = append(resp, TrainSearch(c, req))
 		resp = append(resp, FlightSearch(c, req))
 
+		common.AddTravelRecord(req.TripID, resp[0])
 		common.CommJOSN(c, 200, resp)
 	} else {
 		common.FaildJOSN(c, 200, "")
@@ -73,6 +74,7 @@ type TransferReq struct {
 	ArriveCty    string `json:"arrive"`
 	StartDate    string `json:"sart_date"`
 	EndDate      string `json:"end_date"`
+	TripID       int    `json:"tripid"`
 }
 
 //curl -i -k -X ANY 'https://jisutrain.market.alicloudapi.com/train/station2s?date=2019-11-21&end=%E5%8C%97%E4%BA%AC&ishigh=0&start=%E6%9D%AD%E5%B7%9E'  -H 'Authorization:APPCODE 你自己的AppCode'

@@ -103,15 +103,14 @@ type CommonReq struct {
 	Price     int `json:"price"`
 	Person    int `json:"person"`
 	HotelRate int `json:"hotel_rate"`
+	LiveDays  int `json:"leave_days"`
+	RoomNum   int `json:"room_num"`
 }
 
 func AddTravelRecord(tripId int, travelItem TravelObj) {
 	if tripId > 0 {
 
-		smt, err := DBClient.Prepare(`insert into travel(type, transfer_type, 
-			start_city, end_city, price, desc, title, location, 
-			travel_num, travel_time, image, trip_id) 
-			values(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`)
+		smt, err := DBClient.Prepare("insert into travel(type, transfer_type, start_city, end_city, price, `desc`, title, location, travel_num, travel_time, image, trip_id) values(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)")
 		if err != nil {
 			fmt.Printf("db client preare error: %v", err.Error())
 		}

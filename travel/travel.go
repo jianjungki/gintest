@@ -168,9 +168,7 @@ func TravelCardList(c *gin.Context) {
 	req := TravelIDReq{}
 	if jsonerr := c.BindJSON(&req); jsonerr == nil {
 		respObj := []common.TravelObj{}
-		rows, err := DBClient.Query(`select type, trans_type, start_city, 
-    end_city, price, desc, title, location, 
-    travel_num, travel_time, image, trip_id from travel`)
+		rows, err := DBClient.Query("select type, transfer_type, start_city, end_city, price, `desc`, title, location, travel_num, travel_time, image, trip_id from travel")
 		if err != nil {
 			fmt.Printf("db client query error: %v", err.Error())
 		}

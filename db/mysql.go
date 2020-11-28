@@ -9,6 +9,7 @@ import (
 
 func GetDB() *sql.DB {
 	db, err := sql.Open("mysql", "gintest:Agintest123@tcp(rm-m5e56tpgspvga7jyi125010.mysql.rds.aliyuncs.com:3306)/gintest")
+	//db, err := sql.Open("mysql", "root:123456@/gintest")
 	if err != nil {
 		panic(err)
 	}
