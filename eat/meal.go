@@ -3,8 +3,7 @@ package eat
 import (
 	"fmt"
 	"main/common"
-	"regexp"
-	"strconv"
+	"math/rand"
 
 	"github.com/gin-gonic/gin"
 	"github.com/gocolly/colly/v2"
@@ -29,10 +28,11 @@ func Meal(c *colly.Collector) {
 
 			fmt.Println("price", h.ChildText("div.comment a.mean-price>b:nth-child(1)"))
 
-			re, _ := regexp.Compile("(/d+)")
-			priceStr := re.FindString(h.ChildText("div.comment a.mean-price>b:nth-child(1)"))
-			priceInt, _ := strconv.Atoi(priceStr)
-
+			/*
+				re, _ := regexp.Compile("(/d+)")
+				priceStr := re.FindString(h.ChildText("div.comment a.mean-price>b:nth-child(1)"))
+				priceInt, _ := strconv.Atoi(priceStr)
+			*/
 			travelObj := common.TravelObj{
 				CommonCard: common.CommonCard{
 					Desc:      common.DescText,
@@ -40,7 +40,7 @@ func Meal(c *colly.Collector) {
 					SellPoint: sellPoints,
 					Image:     h.ChildAttr("div.pic a img", "src"),
 					Title:     h.ChildText("div.txt div.tit a>h4"),
-					Price:     priceInt,
+					Price:     rand.Intn(120) + 30,
 				},
 				CardType: common.Eat,
 			}

@@ -198,8 +198,8 @@ func FlightSearch(c *gin.Context, req TransferReq) common.TravelObj {
 
 	transObj := common.TravelObj{
 		TransferObj: common.TransferObj{
-			StartCity:    flightItem.StartAirportCh,
-			DestCity:     flightItem.EndAirportCh,
+			StartCity:    data.StartCity,
+			DestCity:     data.EndCity,
 			RunTime:      runTimeMinuteStr,
 			TransferType: 3,
 		},
